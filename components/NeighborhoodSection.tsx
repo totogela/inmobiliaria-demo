@@ -105,7 +105,7 @@ export default function NeighborhoodSection() {
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '1.25rem',
-        }}>
+        }} className="neighborhood-grid">
           {NEIGHBORHOODS.map((n, i) => (
             <div
               key={i}

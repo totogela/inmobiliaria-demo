@@ -247,7 +247,7 @@ export default function CalculadoraPage() {
                   <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #f5f5f5' }}>
                     <h3 style={{ fontWeight: 700, fontSize: '0.95rem', color: '#171717' }}>Primeros 12 meses</h3>
                   </div>
-                  <div style={{ overflowX: 'auto' }}>
+                  <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#fafafa' }}>

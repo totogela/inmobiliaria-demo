@@ -93,7 +93,7 @@ export default function Hero() {
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.78) 100%)' }} />
 
       {/* Content */}
-      <div style={{
+      <div className="hero-content" style={{
         position: 'relative', zIndex: 10,
         textAlign: 'center',
         padding: '0 1.5rem',
@@ -297,17 +297,26 @@ export default function Hero() {
         backgroundColor: 'rgba(0,0,0,0.55)',
         borderTop: '1px solid rgba(255,255,255,0.07)',
       }}>
-        <div style={{
+        <div className="stats-grid" style={{
           maxWidth: '860px',
           margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'center',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
         }}>
           {STATS.map((s, i) => (
             <StatItem key={i} {...s} started={statsStarted} />
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 600px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .stats-grid > div { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
+          .stats-grid > div:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.08) !important; }
+          .hero-content { padding-bottom: 12rem !important; }
+        }
+      `}</style>
     </section>
   )
 }

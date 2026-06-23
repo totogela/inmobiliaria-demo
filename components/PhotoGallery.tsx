@@ -68,7 +68,7 @@ export default function PhotoGallery() {
         </div>
 
         {/* Masonry grid */}
-        <div style={{
+        <div className="gallery-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gridAutoRows: '200px',
