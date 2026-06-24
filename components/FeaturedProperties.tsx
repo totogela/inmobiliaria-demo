@@ -1,13 +1,18 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { properties } from '@/app/data/properties'
 import PropertyCard from '@/components/PropertyCard'
 
+// Show only first 5 cards in mobile carousel
+const MOBILE_CARDS = properties.slice(0, 5)
+
 export default function FeaturedProperties() {
   const sectionRef = useRef<HTMLElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -15,6 +20,26 @@ export default function FeaturedProperties() {
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
   }, [])
+
+  // Track active card via scroll position
+  const handleScroll = useCallback(() => {
+    const el = carouselRef.current
+    if (!el) return
+    // Each card is ~76vw wide + gap (0.85rem ≈ ~13px)
+    const cardWidth = el.scrollWidth / (MOBILE_CARDS.length)
+    const index = Math.min(
+      Math.round(el.scrollLeft / cardWidth),
+      MOBILE_CARDS.length - 1
+    )
+    setActiveIndex(index)
+  }, [])
+
+  useEffect(() => {
+    const el = carouselRef.current
+    if (!el) return
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [handleScroll, isMobile])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,7 +59,7 @@ export default function FeaturedProperties() {
 
   return (
     <section ref={sectionRef} style={{
-      padding: isMobile ? '3rem 0' : '6rem 1.5rem',
+      padding: isMobile ? '3rem 0 2.5rem' : '6rem 1.5rem',
       backgroundColor: '#f9f8f6',
     }}>
       {/* Header */}
@@ -64,19 +89,23 @@ export default function FeaturedProperties() {
       </div>
 
       {isMobile ? (
-        /* ── Mobile: horizontal swipeable carousel ───────────────── */
-        <>
-          <div style={{
-            display: 'flex',
-            overflowX: 'auto',
-            gap: '0.85rem',
-            padding: '0.25rem 1.1rem 1rem',
-            scrollSnapType: 'x mandatory',
-            WebkitOverflowScrolling: 'touch' as 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          } as React.CSSProperties}>
-            {properties.map((property, i) => (
+        /* ── Mobile: horizontal swipeable carousel, 5 cards ─────── */
+        <div>
+          {/* Carousel */}
+          <div
+            ref={carouselRef}
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              gap: '0.85rem',
+              padding: '0.25rem 1.1rem 0.5rem',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch' as 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            } as React.CSSProperties}
+          >
+            {MOBILE_CARDS.map((property, i) => (
               <div
                 key={property.id}
                 style={{
@@ -89,59 +118,68 @@ export default function FeaturedProperties() {
                 <PropertyCard property={property} index={i} />
               </div>
             ))}
+          </div>
 
-            {/* End CTA card */}
-            <div style={{
-              minWidth: '60vw',
-              flexShrink: 0,
-              scrollSnapAlign: 'start',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '1rem',
-              backgroundColor: '#171717',
-              borderRadius: '1rem',
-              padding: '2rem 1.5rem',
-            }}>
-              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                ¿Querés ver más?
-              </div>
+          {/* Dots — live tracking */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '6px',
+            marginTop: '1rem',
+            marginBottom: '1.25rem',
+          }}>
+            {MOBILE_CARDS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  const el = carouselRef.current
+                  if (!el) return
+                  const cardWidth = el.scrollWidth / MOBILE_CARDS.length
+                  el.scrollTo({ left: i * cardWidth, behavior: 'smooth' })
+                }}
+                style={{
+                  width: i === activeIndex ? '22px' : '7px',
+                  height: '7px',
+                  borderRadius: '9999px',
+                  backgroundColor: i === activeIndex ? '#C9A96E' : '#d4d4d4',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
+                  flexShrink: 0,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Ver más — below carousel */}
+          {properties.length > 5 && (
+            <div style={{ textAlign: 'center', padding: '0 1.5rem' }}>
               <Link
                 href="/propiedades"
                 style={{
-                  backgroundColor: '#C9A96E',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#171717',
                   color: '#fff',
-                  padding: '0.85rem 1.75rem',
+                  padding: '0.85rem 2rem',
                   borderRadius: '0.65rem',
                   fontWeight: 700,
                   fontSize: '0.9rem',
                   textDecoration: 'none',
-                  textAlign: 'center',
-                  display: 'block',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
                 }}
               >
-                Ver todas →
+                Ver las {properties.length - 5} propiedades restantes
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </Link>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
-                +{properties.length} propiedades
-              </div>
             </div>
-          </div>
-
-          {/* Scroll dots indicator */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '5px', marginTop: '0.5rem' }}>
-            {[...Array(Math.min(5, properties.length))].map((_, i) => (
-              <div key={i} style={{
-                width: i === 0 ? '18px' : '6px',
-                height: '6px',
-                borderRadius: '9999px',
-                backgroundColor: i === 0 ? '#C9A96E' : '#d4d4d4',
-                transition: 'all 0.3s',
-              }} />
-            ))}
-          </div>
-        </>
+          )}
+        </div>
       ) : (
         /* ── Desktop: grid ───────────────────────────────────────── */
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>

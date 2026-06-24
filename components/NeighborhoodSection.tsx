@@ -55,10 +55,11 @@ const NEIGHBORHOODS = [
 ]
 
 // Stacking config
-const CARD_H = 215       // visible card height
-const WRAPPER_H = 165    // scroll distance per card (less = more overlap)
-const PEEK = 22          // px each card peeks below the one on top
-const STICKY_BASE = 66   // approx navbar + breathing room
+// WRAPPER_H must be > CARD_H so each card is fully visible before the next enters
+const CARD_H = 245       // full card height (px)
+const WRAPPER_H = 310    // scroll distance per card = CARD_H + 65px pause
+const PEEK = 30          // px each older card peeks out at the top of the stack
+const STICKY_BASE = 66   // distance from viewport top where cards stick (below navbar)
 
 function CardContent({ n, i, hovered, onEnter, onLeave, onClick }: {
   n: typeof NEIGHBORHOODS[0]
@@ -258,8 +259,8 @@ export default function NeighborhoodSection() {
             </div>
           ))}
 
-          {/* Space so last card fully exits stack */}
-          <div style={{ height: `${CARD_H + 32}px` }} />
+          {/* Extra space so last card is fully visible and readable */}
+          <div style={{ height: `${CARD_H + 80}px` }} />
         </div>
       ) : (
         /* ─── DESKTOP: 3-column grid ─────────────────────────────── */
