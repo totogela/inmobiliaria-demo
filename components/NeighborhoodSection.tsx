@@ -55,11 +55,11 @@ const NEIGHBORHOODS = [
 ]
 
 // Stacking config
-// WRAPPER_H must be > CARD_H so each card is fully visible before the next enters
-const CARD_H = 245       // full card height (px)
-const WRAPPER_H = 310    // scroll distance per card = CARD_H + 65px pause
-const PEEK = 30          // px each older card peeks out at the top of the stack
-const STICKY_BASE = 66   // distance from viewport top where cards stick (below navbar)
+// IMPORTANT: sticky cards must be DIRECT children of scroll container — no wrapper divs
+// IMPORTANT: parent must NOT have overflow: hidden (breaks sticky)
+const CARD_H = 250        // card height in px
+const PEEK = 32           // how many px of each older card peek above the newer one
+const STICKY_BASE = 64    // distance from viewport top where card 0 sticks (below navbar)
 
 function CardContent({ n, i, hovered, onEnter, onLeave, onClick }: {
   n: typeof NEIGHBORHOODS[0]
@@ -75,18 +75,15 @@ function CardContent({ n, i, hovered, onEnter, onLeave, onClick }: {
       onClick={onClick}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      onTouchStart={() => {/* allow touch */}}
       style={{
         position: 'relative',
         width: '100%',
         height: '100%',
-        borderRadius: '1.15rem',
+        borderRadius: '1.2rem',
         overflow: 'hidden',
         cursor: 'pointer',
-        boxShadow: isHovered
-          ? '0 28px 60px rgba(0,0,0,0.28)'
-          : '0 8px 28px rgba(0,0,0,0.14)',
-        transition: 'box-shadow 0.35s ease',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
+        transition: 'box-shadow 0.3s ease',
       }}
     >
       <img
@@ -97,55 +94,58 @@ function CardContent({ n, i, hovered, onEnter, onLeave, onClick }: {
         style={{
           width: '100%', height: '100%',
           objectFit: 'cover', display: 'block',
-          transition: 'transform 0.65s cubic-bezier(0.22,1,0.36,1)',
+          transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1)',
           transform: isHovered ? 'scale(1.06)' : 'scale(1)',
         }}
       />
-      {/* Dark gradient */}
+      {/* Dark gradient overlay */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(160deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.72) 70%, rgba(0,0,0,0.9) 100%)',
+        background: 'linear-gradient(160deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.92) 100%)',
       }} />
-      {/* Tag top-left */}
+      {/* Top-left tag */}
       <span style={{
         position: 'absolute', top: '0.85rem', left: '0.85rem',
         backgroundColor: n.tagColor, color: '#fff',
         padding: '0.22rem 0.75rem', borderRadius: '9999px',
-        fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.05em',
+        fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.06em',
         textTransform: 'uppercase',
       }}>
         {n.tag}
       </span>
-      {/* Count top-right */}
+      {/* Top-right count */}
       <span style={{
         position: 'absolute', top: '0.85rem', right: '0.85rem',
         backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)',
         color: '#fff', padding: '0.22rem 0.7rem', borderRadius: '9999px',
-        fontSize: '0.66rem', fontWeight: 600,
+        fontSize: '0.65rem', fontWeight: 600,
       }}>
         {n.propCount} prop.
       </span>
       {/* Bottom content */}
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
-        padding: '0.9rem 1.1rem',
+        padding: '1rem 1.15rem',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
       }}>
         <div>
-          <h3 style={{ color: '#fff', fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.025em', marginBottom: '0.18rem' }}>
+          <h3 style={{
+            color: '#fff', fontSize: '1.15rem', fontWeight: 800,
+            letterSpacing: '-0.025em', marginBottom: '0.2rem',
+          }}>
             {n.name}
           </h3>
-          <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: '0.73rem', lineHeight: 1.4 }}>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.72rem', lineHeight: 1.4 }}>
             {n.description}
           </p>
         </div>
         <div style={{
-          width: '36px', height: '36px', borderRadius: '50%',
+          width: '38px', height: '38px', borderRadius: '50%',
           backgroundColor: '#C9A96E',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0, marginLeft: '0.75rem',
-          transform: isHovered ? 'scale(1.1)' : 'scale(1)',
           transition: 'transform 0.3s ease',
+          transform: isHovered ? 'scale(1.12)' : 'scale(1)',
         }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
             <path d="M5 12h14M12 5l7 7-7 7" />
@@ -190,8 +190,8 @@ export default function NeighborhoodSection() {
       ref={sectionRef}
       style={{
         backgroundColor: '#0f0f0f',
+        // NO overflow: hidden — it breaks position: sticky on children
         padding: isMobile ? '3rem 0 0' : '6rem 1.5rem',
-        overflow: 'hidden',
       }}
     >
       {/* Header */}
@@ -220,47 +220,58 @@ export default function NeighborhoodSection() {
         </p>
       </div>
 
-      {/* ─── MOBILE: Sticky stacking effect ─────────────────────── */}
       {isMobile ? (
+        /* ─── MOBILE: TRUE sticky stacking
+           - Cards are DIRECT children (no wrappers) so sticky spans the whole container
+           - Each card sticks at a progressively lower top value = deck builds up
+           - The natural flow height (6 × CARD_H) creates the scroll distance    ─── */
         <div style={{ position: 'relative' }}>
+
           {/* Scroll hint */}
           <div style={{
-            textAlign: 'center', marginBottom: '0.75rem',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-            color: 'rgba(255,255,255,0.35)', fontSize: '0.7rem', fontWeight: 500,
-            animation: 'float 2s ease-in-out infinite',
+            textAlign: 'center', marginBottom: '1rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
+            color: 'rgba(255,255,255,0.3)', fontSize: '0.7rem', fontWeight: 500,
           }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              style={{ animation: 'float 1.8s ease-in-out infinite' }}>
               <path d="M12 5v14M5 12l7 7 7-7" />
             </svg>
             Bajá para explorar barrios
           </div>
 
+          {/*
+            KEY: cards are direct sticky children.
+            Card 0 sticks at top=64px.
+            Card 1 sticks at top=96px (32px lower) → covers card 0, leaving 32px peeking at top.
+            Card 2 sticks at top=128px → covers card 1, cards 0+1 peek at top.
+            etc.
+            Scroll distance per card = CARD_H (250px) because each sticky card
+            occupies its full height in normal flow.
+          */}
           {NEIGHBORHOODS.map((n, i) => (
             <div
               key={i}
-              style={{ height: `${WRAPPER_H}px`, position: 'relative' }}
-            >
-              <div style={{
+              style={{
                 position: 'sticky',
                 top: `${STICKY_BASE + i * PEEK}px`,
                 zIndex: i + 1,
                 height: `${CARD_H}px`,
                 padding: '0 1.1rem',
-              }}>
-                <CardContent
-                  n={n} i={i}
-                  hovered={hovered}
-                  onEnter={() => setHovered(i)}
-                  onLeave={() => setHovered(null)}
-                  onClick={() => router.push(`/propiedades?zone=${encodeURIComponent(n.name)}`)}
-                />
-              </div>
+              }}
+            >
+              <CardContent
+                n={n} i={i}
+                hovered={hovered}
+                onEnter={() => setHovered(i)}
+                onLeave={() => setHovered(null)}
+                onClick={() => router.push(`/propiedades?zone=${encodeURIComponent(n.name)}`)}
+              />
             </div>
           ))}
 
-          {/* Extra space so last card is fully visible and readable */}
-          <div style={{ height: `${CARD_H + 80}px` }} />
+          {/* Bottom padding so last card rests visible before section ends */}
+          <div style={{ height: '160px', backgroundColor: '#0f0f0f' }} />
         </div>
       ) : (
         /* ─── DESKTOP: 3-column grid ─────────────────────────────── */
@@ -274,7 +285,7 @@ export default function NeighborhoodSection() {
               <div
                 key={i}
                 className={`reveal-scale stagger-${i + 1}`}
-                style={{ height: '268px', borderRadius: '1.15rem', overflow: 'hidden' }}
+                style={{ height: '268px', borderRadius: '1.2rem', overflow: 'hidden' }}
               >
                 <CardContent
                   n={n} i={i}
