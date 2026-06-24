@@ -271,6 +271,18 @@ h1, h2, h3 {
   .btn-whatsapp:hover { background-color: #16a34a; transform: translateY(-2px); }
 }
 
+/* ── Mobile global spacing ───────────────────────────────────── */
+
+@media (max-width: 640px) {
+  /* Reduce section padding on mobile across the whole site */
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+  /* Section headers tighter on mobile */
+  h2 { margin-bottom: 0.5rem !important; }
+}
+
 /* ── Select styling ──────────────────────────────────────────── */
 
 select {

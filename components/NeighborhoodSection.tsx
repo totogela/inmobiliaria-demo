@@ -205,7 +205,24 @@ export default function NeighborhoodSection() {
             .neighborhood-grid { grid-template-columns: repeat(2, 1fr) !important; }
           }
           @media (max-width: 540px) {
-            .neighborhood-grid { grid-template-columns: 1fr !important; }
+            .neighborhood-grid {
+              display: flex !important;
+              flex-direction: row !important;
+              overflow-x: auto !important;
+              gap: 0.85rem !important;
+              padding-bottom: 1rem !important;
+              scroll-snap-type: x mandatory !important;
+              -webkit-overflow-scrolling: touch !important;
+              scrollbar-width: none !important;
+            }
+            .neighborhood-grid::-webkit-scrollbar { display: none; }
+            .neighborhood-grid > div {
+              min-width: 72vw !important;
+              height: 185px !important;
+              flex-shrink: 0 !important;
+              scroll-snap-align: start !important;
+              transform: none !important;
+            }
           }
         `}</style>
       </div>

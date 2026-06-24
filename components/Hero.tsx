@@ -312,9 +312,17 @@ export default function Hero() {
       <style>{`
         @media (max-width: 600px) {
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .stats-grid > div { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
+          .stats-grid > div {
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0.9rem 0.5rem !important;
+          }
           .stats-grid > div:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.08) !important; }
-          .hero-content { padding-bottom: 12rem !important; }
+          .hero-content { padding-bottom: 10rem !important; padding-top: 2rem !important; }
+          .hero-badge { margin-bottom: 1rem !important; }
+          .hero-subtitle { margin-bottom: 1.5rem !important; }
+          .hero-ctas { gap: 0.75rem !important; }
+          .hero-cta-pill { padding: 0.6rem 1.25rem !important; font-size: 0.85rem !important; }
         }
       `}</style>
     </section>

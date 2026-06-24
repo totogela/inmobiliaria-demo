@@ -77,7 +77,7 @@ export default function PhotoGallery() {
           {PHOTOS.map((photo, i) => (
             <div
               key={i}
-              className={`reveal-scale stagger-${i + 1}`}
+              className={`reveal-scale stagger-${i + 1} gallery-item`}
               onClick={() => setLightbox(photo.src)}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
@@ -138,13 +138,14 @@ export default function PhotoGallery() {
           ))}
         </div>
 
-        {/* Responsive note */}
         <style>{`
           @media (max-width: 768px) {
-            .gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: 160px !important; }
           }
           @media (max-width: 480px) {
-            .gallery-grid { grid-template-columns: 1fr !important; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: 130px !important; }
+            .gallery-item { grid-column: span 1 !important; grid-row: span 1 !important; }
+            .gallery-item:nth-child(n+7) { display: none !important; }
           }
         `}</style>
       </div>

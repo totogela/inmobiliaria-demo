@@ -4,7 +4,12 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer style={{ backgroundColor: '#171717', color: '#a3a3a3', padding: '4.5rem 1.5rem 2rem' }}>
+    <footer className="site-footer" style={{ backgroundColor: '#171717', color: '#a3a3a3', padding: '4.5rem 1.5rem 2rem' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .site-footer { padding: 2.5rem 1.25rem 1.5rem !important; }
+        }
+      `}</style>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '2.5rem', marginBottom: '3.5rem' }}>
 

@@ -1,12 +1,25 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { properties } from '@/app/data/properties'
 import PropertyCard from '@/components/PropertyCard'
 
+const MOBILE_LIMIT = 4
+
 export default function FeaturedProperties() {
   const sectionRef = useRef<HTMLElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  const visibleProperties = isMobile && !showAll ? properties.slice(0, MOBILE_LIMIT) : properties
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -62,13 +75,34 @@ export default function FeaturedProperties() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
           gap: '1.5rem',
         }}>
-          {properties.map((property, i) => (
+          {visibleProperties.map((property, i) => (
             <PropertyCard key={property.id} property={property} index={i} />
           ))}
         </div>
 
+        {/* Mobile "Ver más" button */}
+        {isMobile && !showAll && properties.length > MOBILE_LIMIT && (
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <button
+              onClick={() => setShowAll(true)}
+              style={{
+                backgroundColor: 'transparent',
+                border: '1.5px solid #C9A96E',
+                color: '#C9A96E',
+                padding: '0.75rem 2rem',
+                borderRadius: '0.65rem',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+              }}
+            >
+              Ver {properties.length - MOBILE_LIMIT} propiedades más
+            </button>
+          </div>
+        )}
+
         {/* CTA */}
-        <div className="reveal" style={{ textAlign: 'center', marginTop: '3.5rem' }}>
+        <div className="reveal" style={{ textAlign: 'center', marginTop: '2.5rem' }}>
           <Link
             href="/propiedades"
             style={{
