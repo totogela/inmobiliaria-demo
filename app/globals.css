@@ -90,36 +90,46 @@ h1, h2, h3 {
 
 .reveal {
   opacity: 0;
-  transform: translateY(36px);
-  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(28px);
+  filter: blur(2px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease;
 }
-.reveal.revealed  { opacity: 1; transform: translateY(0); }
+.reveal.revealed { opacity: 1; transform: translateY(0); filter: blur(0); }
 
 .reveal-left {
   opacity: 0;
-  transform: translateX(-36px);
-  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-28px);
+  filter: blur(2px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease;
 }
-.reveal-left.revealed { opacity: 1; transform: translateX(0); }
+.reveal-left.revealed { opacity: 1; transform: translateX(0); filter: blur(0); }
 
 .reveal-scale {
   opacity: 0;
-  transform: scale(0.92) translateY(16px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(0.88) translateY(20px);
+  filter: blur(3px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.45s ease;
 }
-.reveal-scale.revealed { opacity: 1; transform: scale(1) translateY(0); }
+.reveal-scale.revealed { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 
 /* Editorial text reveal — used on big headings */
 .reveal-text {
   opacity: 0;
-  transform: translateY(20px);
-  filter: blur(3px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              filter 0.6s ease;
+  transform: translateY(24px);
+  filter: blur(4px);
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.6s ease;
 }
 .reveal-text.revealed { opacity: 1; transform: translateY(0); filter: blur(0); }
 
@@ -127,8 +137,9 @@ h1, h2, h3 {
 .reveal-img {
   opacity: 0;
   transform: translateX(-20px) scale(1.03);
-  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-img.revealed { opacity: 1; transform: translateX(0) scale(1); }
 
@@ -274,14 +285,16 @@ h1, h2, h3 {
 /* ── Mobile global spacing ───────────────────────────────────── */
 
 @media (max-width: 640px) {
-  /* Reduce section padding on mobile across the whole site */
   section {
     padding-top: 3rem !important;
     padding-bottom: 3rem !important;
   }
-  /* Section headers tighter on mobile */
-  h2 { margin-bottom: 0.5rem !important; }
 }
+
+/* ── Horizontal carousel hide scrollbar ─────────────────────── */
+
+.snap-carousel::-webkit-scrollbar { display: none; }
+.snap-carousel { scrollbar-width: none; }
 
 /* ── Select styling ──────────────────────────────────────────── */
 
